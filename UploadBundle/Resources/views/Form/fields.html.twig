@@ -1,0 +1,64 @@
+{% extends 'form_div_layout.html.twig' %}
+
+{% block upbeat_upload_type_widget %}
+    {% set type = type|default('hidden') %}
+    {% set class = file_type %}
+    {% set container = "container_"~id %}
+
+
+    <input param="{{ id }}" type="{{ type }}" {{ block('widget_attributes') }} value="{{ value }}" class="{{ class }}" />
+    {% include template with {
+        name: name,
+        value: value,
+        class: class,
+        crop: crop,
+        crop_width: crop_width,
+        crop_height: crop_height,
+        token: secure_token,
+        id: id,
+        container: container
+    } %}
+    {% if use_plupload %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var uploader{{ id }} = new plupload.Uploader({
+                    runtimes : 'html5,flash,silverlight,html4',
+                    browse_button : 'uploadFile_{{ id }}', // you can pass in id or DOM Element itself
+                    container: '{{ container }}',
+                    max_file_size : '10mb',
+                    url : '{{ path('site_upload_bundle_handle_file') }}',
+                    multi_selection: false,
+                    flash_swf_url : '{{ asset('bundles/siteupload/swf/plupload.flash.swf') }}',
+                    silverlight_xap_url : '{{ asset('bundles/siteupload/swf/plupload.silverlight.xap') }}',
+                    filters : [
+                        {title : "Image files", extensions : "{{ extensions }}"}
+                    ],
+                    multipart_params : {
+                        "type" : '{{ file_type }}',
+                        "field" : '{{ name }}',
+                        "secure_token" : '{{ secure_token }}'
+                    },
+                    init : {
+
+                        FilesAdded: function(up, files) {
+                            up.start();
+                            startFunction{{ id }}();
+                        },
+
+                        FileUploaded: function (up, files, response)
+                        {
+                            callbackFunction{{ id }}(response);
+                        },
+
+                        UploadComplete: function  ()
+                        {
+                            finalFunction{{ id }}();
+                        }
+                    }
+                });
+
+                uploader{{ id }}.init();
+            });
+        </script>
+    {% endif %}
+{% endblock %}

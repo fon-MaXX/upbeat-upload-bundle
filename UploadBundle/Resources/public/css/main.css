@@ -1,0 +1,15 @@
+form .a2lix_translationsLocales li { background-color: #ffffff; }
+.hidden-fields
+{
+    display: none !important;
+}
+.offset-1{
+    margin-top:15px;
+    margin-bottom:15px;
+}
+.min-height-500{
+    min-height:500px;
+}
+#upbeat-user-menu{
+    width:auto;
+}

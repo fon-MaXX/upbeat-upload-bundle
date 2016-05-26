@@ -1,0 +1,25 @@
+services:
+#twig extencion
+    json.decode.twig_extension:
+        class: Site\UploadBundle\Twig\Extension\JsonDecodeExtension
+        public: false
+        arguments: [@service_container]
+        tags:
+          - { name: twig.extension }
+
+    json.detect.twig_extension:
+        class: Site\UploadBundle\Twig\Extension\JsonDetectExtension
+        public: false
+        arguments: [@service_container]
+        tags:
+          - { name: twig.extension }
+#file handler
+    upbeat_file_upload.handler:
+        class: Site\UploadBundle\Services\FileHandler
+        arguments: [@session, %site_upload.types%,%site_upload.temp_upload_dir%,%site_upload.web_dir%,%kernel.root_dir%]
+
+    upbeat_file_upload.form.type:
+        class: Site\UploadBundle\Form\UpbeatUploadType
+        arguments: [@form.csrf_provider, @session]
+        tags:
+            - { name: form.type, alias: 'upbeat_upload_type' }

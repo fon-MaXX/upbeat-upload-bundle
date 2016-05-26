@@ -1,0 +1,43 @@
+var jcrop_{{ id }};
+{% if crop_width|length and crop_height|length %}
+    $('#{{ id }}').Jcrop({
+        bgColor:     'transparent',
+        bgFade:     true,
+        bgOpacity:   .4,
+        allowSelect: false,
+        allowMove: true,
+        allowResize: false,
+        setSelect:   [ 0, 0, {{ crop_width }}, {{ crop_height }} ],
+        aspectRatio: {{ crop_width }} /{{ crop_height }}
+    },function(){
+        jcrop_{{ id }}=this;
+    });
+{% else %}
+    $('.{{ id }}').Jcrop(
+        {},
+        function(){
+        jcrop_{{ id }}=this;
+        });
+{% endif %}
+$('{{ container }}').append("<a data-url='{{ url('site_upload_bundle_crop_file') }}' style='margin-left:10px;' class='btn cropButton' href='javascript:void(0)' id='crop_{{ id }}'>Crop</a>");
+$("#crop_{{ id }}").click(function(){
+    var object= jcrop_{{ id }}.tellSelect();
+    var url=$(this).attr('data-url');
+    object.path=$({{ id }}).attr('src');
+    object.type="{{ type }}";
+    object.field = "{{ name }}"
+{# post #}
+$.post(url,object,function(res){
+    if(res.success){
+        jcrop_{{ id }}.destroy();
+        $('#{{ id }}').remove();
+        $("#crop_{{ id }}").remove();
+        crop_{{ callback }}(res);
+{#make send button visible#}
+    }
+    else{
+    console.log(res);
+    }
+    {% set crop = false  %}
+});
+});

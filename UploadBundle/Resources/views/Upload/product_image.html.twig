@@ -1,0 +1,90 @@
+<div id="{{ container }}">
+    {% if value|json_decode is not null %}
+        {% for item in value|json_decode %}
+            {% if item|json_detect %}
+                <img src="{{ item|json_decode.path }}" style="max-height: 300px; max-width: 300px; padding: 0 5px;" alt="{{ item|json_decode.path }}">
+            {% else %}
+                <img src="{{ item }}" style="max-height: 300px; max-width: 300px; padding: 0 5px;" alt="{{ item }}">
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <img class="no-image" src="{{ asset('bundles/sitebackend/images/noimage.jpg') }}"  alt="no-image">
+    {% endif %}
+
+    <div align="clearfix"></div>
+    <a class="btn UploadButton" href="#" id="uploadFile_{{ id }}">
+        Load
+    </a>
+</div>
+
+{% set  container= '#'~container %}
+{% set callback ='callbackFunction'~id  %}
+<script type="text/javascript">
+    var ups = [];
+    function startFunction{{ id }}()
+    {
+        var container = '{{ container }}';
+        $('img', container).remove();
+        $('.jcrop-holder', container).remove();
+        $('.cropButton', container).remove();
+        $(container).prepend('<img class="ajax-loader" src="{{ asset('bundles/sitebackend/images/ajax-loader.gif') }}" alt="loader">');
+    }
+    function {{ callback }}(response)
+    {
+
+        var res = $.parseJSON(response.response);
+        var container = '{{ container }}';
+        if (res.success)
+        {
+            $('.ajax-loader', container).remove();
+            {% set imgid='crop_'~id %}
+            var file=$.parseJSON(res.file);
+            $(container).prepend('<img id="{{ imgid }}" src="' +file.path+'" alt="img">');
+// add crop functional+crop button
+            {% if crop == true %}
+                {%  include "SiteUploadBundle:Upload:_add_crop.html.twig" with{
+                        'id':imgid,
+                        'crop_width':crop_width,
+                        'crop_height':crop_height,
+                        'container':container,
+                        'callback':callback,
+                        'type': class
+                        }
+                %}
+            {% endif %}
+            ups = [];
+            ups.push(res.file);
+            $("input[param='{{ id }}']").val(JSON.stringify(ups));
+
+        }
+        else
+        {
+            alert(res.error);
+        }
+    }
+    function crop_{{ callback }}(response)
+    {
+        var container = '{{ container }}';
+        if (response.success)
+        {
+            $('.ajax-loader', container).remove();
+            {% set imgid='crop_'~id %}
+            var file=$.parseJSON(response.file);
+            $(container).prepend('<img id="{{ imgid }}" src="' +file.path+'" alt="img">');
+            ups = [];
+            ups.push(response.file);
+            $("input[param='{{ id }}']").val(JSON.stringify(ups));
+
+        }
+        else
+        {
+            alert(response.error);
+        }
+    }
+
+    function finalFunction{{ id }}()
+    {
+        $('input[param={{ id }}]').val(JSON.stringify(ups));
+        $('.ajax-loader', '{{ container }}').remove();
+    }
+</script>

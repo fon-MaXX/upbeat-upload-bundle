@@ -1,0 +1,13 @@
+{#
+BLA-BLA-BlA
+rewrite blocks for your own needs
+#}
+
+{% extends 'SonataDoctrineORMAdminBundle:Form:form_admin_fields.html.twig' %}
+{% block sonata_admin_orm_one_to_many_widget %}
+    {% if sonata_admin.name == "files"  %}
+        {% include 'SiteUploadBundle:SonataTheme:files_one_to_many.html.twig' %}
+    {% else %}
+        {% include 'SonataDoctrineORMAdminBundle:CRUD:edit_orm_one_to_many.html.twig' %}
+    {% endif %}
+{% endblock %}
